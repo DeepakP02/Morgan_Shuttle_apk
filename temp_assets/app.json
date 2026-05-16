@@ -1,0 +1,64 @@
+{
+  "expo": {
+    "name": "morgan-shuttle-app",
+    "slug": "morgan-shuttle-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to share shuttle tracking with passengers."
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyDa7VfoVVaw1948Stfvu9LL1kYjYpvxFFA"
+      }
+    },
+    "android": {
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "FOREGROUND_SERVICE"
+      ],
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.yash_s_s.morganshuttleapp",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCuTsTx_q3YnJoB5kxsyw3bvYtLEWWCGVE"
+        }
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/6652c2c7-be65-4b72-a846-61ea89f95cab",
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
+    "runtimeVersion": "1.0.0",
+    "extra": {
+      "eas": {
+        "projectId": "dce739d5-c29a-4d70-9447-511f191f1186"
+      }
+    },
+    "plugins": [
+      "expo-localization",
+      "@react-native-community/datetimepicker",
+      "expo-secure-store"
+    ]
+  }
+}
