@@ -3,7 +3,8 @@ import Constants from 'expo-constants';
 
 // Automatically switch based on environment
 export const IS_PRODUCTION = true; // Set to true for production backend
-const LIVE_URL = 'https://morgan-backend-production-a281.up.railway.app/api';
+// const LIVE_URL = 'https://morgan-backend-production-a281.up.railway.app/api';
+const LIVE_URL = 'https://moargan-production.up.railway.app/api';
 const expoHost = Constants.expoConfig?.hostUri?.split(':')?.[0];
 const LAN_URL = expoHost ? `http://${expoHost}:5000/api` : null;
 const EMULATOR_OR_LOCALHOST_URL =

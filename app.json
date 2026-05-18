@@ -29,18 +29,20 @@
       }
     },
     "android": {
+      "package": "com.yash_s_s.morganshuttleapp",
+      "versionCode": 9,
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION",
         "FOREGROUND_SERVICE",
         "FOREGROUND_SERVICE_LOCATION",
+        "android.permission.POST_NOTIFICATIONS",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_BACKGROUND_LOCATION",
         "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_LOCATION",
-        "android.permission.POST_NOTIFICATIONS"
+        "android.permission.FOREGROUND_SERVICE_LOCATION"
       ],
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF",
@@ -49,8 +51,6 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.yash_s_s.morganshuttleapp",
-      "versionCode": 9,
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyCuTsTx_q3YnJoB5kxsyw3bvYtLEWWCGVE"
@@ -69,13 +69,20 @@
     "runtimeVersion": "1.0.0",
     "extra": {
       "eas": {
-        "projectId": "9d0d63f6-cb74-4ddc-95be-62bf6bc54b1f"
+        "projectId": "a4bea5a8-d1d6-4c5e-9628-1bcd7ff8cc68"
       }
     },
     "plugins": [
       "expo-localization",
       "@react-native-community/datetimepicker",
       "expo-secure-store",
+      [
+        "react-native-maps",
+        {
+          "iosGoogleMapsApiKey": "AIzaSyDa7VfoVVaw1948Stfvu9LL1kYjYpvxFFA",
+          "androidGoogleMapsApiKey": "AIzaSyCuTsTx_q3YnJoB5kxsyw3bvYtLEWWCGVE"
+        }
+      ],
       [
         "expo-location",
         {
