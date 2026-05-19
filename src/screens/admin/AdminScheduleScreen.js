@@ -35,7 +35,30 @@ export const AdminScheduleScreen = () => {
      if (!t || !t.date) return false;
      const [y, m, d] = t.date.split('-').map(Number);
      const tripDate = new Date(y, m - 1, d);
-     return isSameDay(tripDate, selectedDate);
+     
+     // 1. If it's the exact same day, always show it
+     if (isSameDay(tripDate, selectedDate)) return true;
+     
+     // 2. If it is a recurring trip, check if the selected date falls within its active period
+     if (t.is_recurring) {
+        // Strip the time portions so we only compare the calendar days
+        const compareSelected = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+        const compareTripStart = new Date(tripDate.getFullYear(), tripDate.getMonth(), tripDate.getDate());
+        
+        // It must be on or after the day the trip was created
+        const isAfterStart = compareSelected >= compareTripStart;
+        
+        let isBeforeEnd = true;
+        if (t.recurring_end_date) {
+           const [ey, em, ed] = t.recurring_end_date.split('-').map(Number);
+           const compareTripEnd = new Date(ey, em - 1, ed);
+           isBeforeEnd = compareSelected <= compareTripEnd;
+        }
+        
+        return isAfterStart && isBeforeEnd;
+     }
+     
+     return false;
   });
 
   const handleAddTrip = async () => {
