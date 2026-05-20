@@ -34,6 +34,7 @@ const normalizeUserData = (rawUser = {}, fallback = {}) => {
   const merged = { ...fallback, ...rawUser };
   return {
     ...merged,
+    id: merged.id || merged.user_id || merged.userId || merged._id || fallback.id || fallback.user_id || fallback.userId || fallback._id,
     phone: merged.phone || merged.mobile || merged.mobile_number || merged.phone_number || fallback.phone || '',
     extra:
       merged.extra ||
@@ -587,8 +588,12 @@ export const GlobalProvider = ({ children }) => {
     AsyncStorage.multiRemove([USER_TOKEN_STORAGE_KEY, USER_DATA_STORAGE_KEY, DRIVER_SESSION_KEY]);
   }, []);
 
-  const bookTrip = async (tripId, seats) => {
+  const bookTrip = async (tripId, seats, options = {}) => {
     let previousRemaining = null;
+    const userId = user?.id || user?.user_id || user?.userId || user?._id;
+    if (!userId) {
+      throw new Error('Booking failed: resident profile is missing a user id.');
+    }
     setTrips((prev) =>
       prev.map((t) => {
         if (t.id !== tripId) return t;
@@ -598,7 +603,19 @@ export const GlobalProvider = ({ children }) => {
       })
     );
     try {
-      const response = await axios.post('/bookings', { trip_id: tripId, user_id: user.id, seats });
+      const occurrenceDate = options.occurrenceDate || options.date || null;
+      const response = await axios.post('/bookings', {
+        trip_id: tripId,
+        user_id: userId,
+        seats,
+        ...(occurrenceDate
+          ? {
+              date: occurrenceDate,
+              booking_date: occurrenceDate,
+              occurrence_date: occurrenceDate,
+            }
+          : {}),
+      });
       if (response.data.success) {
         fetchTrips();
         fetchBookings();

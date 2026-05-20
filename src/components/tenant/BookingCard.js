@@ -27,9 +27,14 @@ export const BookingCard = ({ trip, booking, onCancel }) => {
   const { trips, bookings, refreshShuttleLive } = useGlobal();
   const data = trip || booking;
   const isBooking = !!booking;
+  const tripOccurrenceDate = trip?.occurrence_date || trip?.date;
   
   // Check if current user already has a booking for this trip
-  const isAlreadyBooked = !isBooking && bookings.some(b => b.trip_id === trip?.id);
+  const isAlreadyBooked = !isBooking && bookings.some((b) => {
+    if (b?.trip_id !== trip?.id) return false;
+    const bookingDate = b.date || b.booking_date || b.trip_date || b.occurrence_date;
+    return !tripOccurrenceDate || !bookingDate || bookingDate === tripOccurrenceDate;
+  });
   
   const seatsRemaining = data?.seats_remaining || 0;
   const isAvailable = seatsRemaining > 0 || isBooking;
@@ -60,6 +65,7 @@ export const BookingCard = ({ trip, booking, onCancel }) => {
 
   const isDeparted = isExpired && normalizedStatus !== 'scheduled';
   const canBook = isAvailable && !isExpired && !isDone && !isAlreadyBooked && normalizedStatus !== 'in_progress';
+  const showEndedNotice = !isBooking && isExpired && !isDone;
 
   const bMeta = isBooking ? bookingStatusMeta(booking.status, t) : null;
 
@@ -123,23 +129,28 @@ export const BookingCard = ({ trip, booking, onCancel }) => {
             </TouchableOpacity>
           </View>
         ) : (
-          <TouchableOpacity 
-            style={[styles.reserveBtn, !canBook && styles.btnDisabled]} 
-            onPress={() => canBook && navigation.navigate('BookingModal', { trip })}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.reserveText}>
-              {isDone
-                ? 'COMPLETED'
-                : isDeparted
-                  ? 'DEPARTED'
-                  : isAlreadyBooked
-                    ? 'YOU BOOKED'
-                    : isAvailable
-                      ? t('tenant.book_now').toUpperCase() + ' >'
-                      : 'FULL'}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.reserveArea}>
+            {showEndedNotice && (
+              <Text style={styles.endedNotice}>This trip has ended.</Text>
+            )}
+            <TouchableOpacity 
+              style={[styles.reserveBtn, !canBook && styles.btnDisabled]} 
+              onPress={() => canBook && navigation.navigate('BookingModal', { trip })}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.reserveText}>
+                {isDone
+                  ? 'COMPLETED'
+                  : isDeparted
+                    ? 'DEPARTED'
+                    : isAlreadyBooked
+                      ? 'YOU BOOKED'
+                      : isAvailable
+                        ? t('tenant.book_now').toUpperCase() + ' >'
+                        : 'FULL'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         )}
       </View>
     </View>
@@ -212,6 +223,17 @@ const styles = StyleSheet.create({
   },
   footer: { 
     alignItems: 'flex-end' 
+  },
+  reserveArea: {
+    width: '100%',
+    alignItems: 'flex-end'
+  },
+  endedNotice: {
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+    fontSize: 12,
+    fontWeight: '800',
+    color: COLORS.gray[300]
   },
   reserveBtn: { 
     backgroundColor: COLORS.primary, 

@@ -40,7 +40,7 @@ const settingRowStyles = StyleSheet.create({
 });
 
 export const PrivacySecurityScreen = ({ navigation }) => {
-  const { user, updateUser, currentRole } = useGlobal();
+  const { user, updateUser, currentRole, login } = useGlobal();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [settings, setSettings] = useState({
@@ -54,22 +54,31 @@ export const PrivacySecurityScreen = ({ navigation }) => {
 
   // Load settings from SecureStore on mount — scoped per user
   useEffect(() => {
-    if (!user?.id) return;
+    const userId = user?.id || user?.user_id || user?.userId || user?._id;
+    if (!userId && !user?.email) return;
     (async () => {
       try {
-        const stored = await SecureStore.getItemAsync(getSettingsKey(user.id));
+        const stored =
+          (userId ? await SecureStore.getItemAsync(getSettingsKey(userId)) : null) ||
+          (user?.email ? await SecureStore.getItemAsync(getSettingsKey(user.email)) : null);
         if (stored) setSettings(JSON.parse(stored));
         else setSettings({ biometrics: false, notifications: true, dataSharing: true });
       } catch (e) {
         console.warn('Could not load settings:', e.message);
       }
     })();
-  }, [user?.id]);
+  }, [user?.id, user?.user_id, user?.userId, user?._id, user?.email]);
 
   const saveSettings = async (updated) => {
     // We already call setSettings in the caller for UX, so just persist here
     try {
-      await SecureStore.setItemAsync(getSettingsKey(user?.id), JSON.stringify(updated));
+      const userId = user?.id || user?.user_id || user?.userId || user?._id;
+      if (userId) {
+        await SecureStore.setItemAsync(getSettingsKey(userId), JSON.stringify(updated));
+      }
+      if (user?.email) {
+        await SecureStore.setItemAsync(getSettingsKey(user.email), JSON.stringify(updated));
+      }
     } catch (e) {
       console.warn('Could not save settings:', e.message);
     }
@@ -105,8 +114,8 @@ export const PrivacySecurityScreen = ({ navigation }) => {
     if (!biometricPassword) return;
     setIsVerifying(true);
     try {
-      // We assume the user email is available in GlobalContext
       if (user?.email) {
+        await login(user.email, biometricPassword);
         // We save it to SecureStore. Next time they use biometric button on login, 
         // it will successfully fetch these.
         await SecureStore.setItemAsync('biometric_email', user.email);

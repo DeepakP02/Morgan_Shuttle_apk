@@ -47,7 +47,7 @@ export const LoginScreen = ({ navigation }) => {
       const settingsKey = savedEmail ? getSettingsKey(savedEmail) : getSettingsKey('default');
       const settingsRaw = await SecureStore.getItemAsync(settingsKey);
       const settings = settingsRaw ? JSON.parse(settingsRaw) : {};
-      const biometricsEnabled = !!settings.biometrics;
+      const biometricsEnabled = !!settings.biometrics || (!!savedEmail && !!savedPassword);
       setBiometricAvailable(compatible && enrolled && biometricsEnabled && !!savedEmail && !!savedPassword);
     })();
   }, []);
@@ -99,14 +99,6 @@ export const LoginScreen = ({ navigation }) => {
       }
 
       // 3. Check for saved credentials
-      // Use saved email as settings key identifier
-      const settingsKey = savedEmail ? getSettingsKey(savedEmail) : getSettingsKey('default');
-      const settingsRaw = await SecureStore.getItemAsync(settingsKey);
-      const settings = settingsRaw ? JSON.parse(settingsRaw) : {};
-      if (!settings.biometrics) {
-        Alert.alert('Biometric Login Disabled', 'Enable biometric login from Privacy & Security settings first.');
-        return;
-      }
       const savedEmail = await SecureStore.getItemAsync('biometric_email');
       const savedPassword = await SecureStore.getItemAsync('biometric_password');
 
@@ -115,6 +107,15 @@ export const LoginScreen = ({ navigation }) => {
           'Setup Required',
           'Log in with email & password once first to enable biometric login.',
         );
+        return;
+      }
+
+      // Use saved email as settings key identifier
+      const settingsKey = getSettingsKey(savedEmail);
+      const settingsRaw = await SecureStore.getItemAsync(settingsKey);
+      const settings = settingsRaw ? JSON.parse(settingsRaw) : {};
+      if (!settings.biometrics && (!savedEmail || !savedPassword)) {
+        Alert.alert('Biometric Login Disabled', 'Enable biometric login from Privacy & Security settings first.');
         return;
       }
 

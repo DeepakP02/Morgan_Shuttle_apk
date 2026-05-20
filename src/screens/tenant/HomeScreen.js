@@ -16,6 +16,7 @@ export const HomeScreen = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const dates = Array.from({ length: 8 }, (_, i) => addDays(new Date(), i));
+  const selectedDateKey = format(selectedDate, 'yyyy-MM-dd');
   const filteredTrips = trips.filter(t => {
      if (!t || !t.date) return false;
      const [y, m, d] = t.date.split('-').map(Number);
@@ -44,7 +45,12 @@ export const HomeScreen = ({ navigation }) => {
      }
      
      return false;
-  });
+  }).map((trip) => ({
+    ...trip,
+    original_date: trip.date,
+    occurrence_date: selectedDateKey,
+    date: selectedDateKey,
+  }));
 
   const renderDate = ({ item }) => {
     const isSelected = isSameDay(item, selectedDate);
@@ -131,7 +137,7 @@ export const HomeScreen = ({ navigation }) => {
 
         <View style={styles.routeContainer}>
           {filteredTrips.map(item => (
-            <BookingCard key={item.id} trip={item} />
+            <BookingCard key={`${item.id}-${item.occurrence_date || item.date}`} trip={item} />
           ))}
 
           {filteredTrips.length === 0 && (
@@ -258,6 +264,5 @@ const styles = StyleSheet.create({
   serviceTitle: { fontSize: 13, fontWeight: '900', color: COLORS.black, letterSpacing: 0.3 },
   serviceSub: { fontSize: 8, color: COLORS.gray[300], fontWeight: '900', marginTop: 2, textTransform: 'uppercase', letterSpacing: 1 },
 });
-
 
 

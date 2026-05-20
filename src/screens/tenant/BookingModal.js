@@ -23,7 +23,15 @@ export const BookingModal = ({ route, navigation }) => {
   const [seats, setSeats] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  const liveTrip = trips?.find((x) => x.id === trip.id) || trip;
+  const latestTrip = trips?.find((x) => x.id === trip.id);
+  const liveTrip = latestTrip
+    ? {
+        ...trip,
+        ...latestTrip,
+        date: trip.date,
+        occurrence_date: trip.occurrence_date || trip.date,
+      }
+    : trip;
   const seatsRemaining = liveTrip?.seats_remaining ?? trip.seats_remaining;
 
   React.useEffect(() => {
@@ -33,7 +41,9 @@ export const BookingModal = ({ route, navigation }) => {
   const handleBooking = async () => {
     setLoading(true);
     try {
-      await bookTrip(liveTrip.id, seats);
+      await bookTrip(liveTrip.id, seats, {
+        occurrenceDate: liveTrip.occurrence_date || liveTrip.date,
+      });
       Alert.alert(t('tenant.booking_confirmed'), t('tenant.booking_success'));
       navigation.goBack();
     } catch (err) {
